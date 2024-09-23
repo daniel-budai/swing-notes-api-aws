@@ -1,0 +1,109 @@
+org: danielbudai
+service: swing-notes-ovning
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-north-1
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [NotesTable, Arn]
+            - Fn::GetAtt: [UsersTable, Arn]
+  environment:
+    NOTES_TABLE: notes-table
+    USERS_TABLE: notes-table-user
+    JWT_SECRET: your-jwt-secret
+
+functions:
+  api:
+    handler: handler.handler
+    events:
+      - httpApi: "*"
+  getNotes:
+    handler: functions/Notes/getNotes/getNotes.handler
+    events:
+      - httpApi:
+          path: /notes
+          method: get
+  addNotes:
+    handler: functions/Notes/addNotes/addNotes.handler
+    events:
+      - httpApi:
+          path: /notes
+          method: post
+  updateNotes:
+    handler: functions/Notes/updateNotes/updateNotes.handler
+    events:
+      - httpApi:
+          path: /notes
+          method: put
+  deleteNotes:
+    handler: functions/Notes/deleteNotes/deleteNotes.handler
+    events:
+      - httpApi:
+          path: /notes
+          method: delete
+  signup:
+    handler: functions/User/signup/signup.handler
+    events:
+      - httpApi:
+          path: /user/signup
+          method: post
+  login:
+    handler: functions/User/login/login.handler
+    events:
+      - httpApi:
+          path: /user/login
+          method: post
+
+resources:
+  Resources:
+    NotesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: notes-table
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: createdAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: notes-table-user
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: username
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: username-index
+            KeySchema:
+              - AttributeName: username
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL

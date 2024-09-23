@@ -1,0 +1,16 @@
+{
+  "name": "swing-notes-ovning",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.585.0",
+    "@aws-sdk/lib-dynamodb": "^3.585.0",
+    "@middy/core": "4.7.0",
+    "@middy/http-error-handler": "4.7.0",
+    "@middy/http-json-body-parser": "4.7.0",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "serverless-http": "^3.2.0",
+    "uuid": "^10.0.0"
+  }
+}
