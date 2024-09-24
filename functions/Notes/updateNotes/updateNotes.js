@@ -7,13 +7,7 @@ const authMiddleware = require("../../../middleware/authMiddleware");
 const updateNote = async (event) => {
   const { id, title, text } = event.body;
 
-  if (!title || !text || title.length > 50 || text.length > 300) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid note data" }),
-    };
-  }
-
+  const now = Date.now();
   const params = {
     TableName: process.env.NOTES_TABLE,
     Key: { id },
@@ -25,7 +19,7 @@ const updateNote = async (event) => {
     ExpressionAttributeValues: {
       ":title": title,
       ":text": text,
-      ":modifiedAt": Date.now(),
+      ":modifiedAt": now,
     },
     ReturnValues: "ALL_NEW",
   };

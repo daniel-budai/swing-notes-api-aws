@@ -23,7 +23,7 @@ const addNote = async (event) => {
     title,
     text,
     createdAt: now,
-    modifiedAt: now,
+    modifiedAt: null,
   };
 
   const params = {
