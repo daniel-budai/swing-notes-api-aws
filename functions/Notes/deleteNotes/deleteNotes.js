@@ -7,6 +7,13 @@ const authMiddleware = require("../../../middleware/authMiddleware");
 const deleteNote = async (event) => {
   const { id } = event.body;
 
+  if (!id) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Note ID is required" }),
+    };
+  }
+
   const params = {
     TableName: process.env.NOTES_TABLE,
     Key: { id },
@@ -19,9 +26,13 @@ const deleteNote = async (event) => {
       body: JSON.stringify({ message: "Note deleted" }),
     };
   } catch (error) {
+    console.error("Error deleting note:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Could not delete note" }),
+      body: JSON.stringify({
+        error: "Could not delete note",
+        details: error.message,
+      }),
     };
   }
 };
