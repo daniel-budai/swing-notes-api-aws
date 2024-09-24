@@ -18,7 +18,10 @@ const updateNote = async (event) => {
     TableName: process.env.NOTES_TABLE,
     Key: { id },
     UpdateExpression:
-      "set title = :title, text = :text, modifiedAt = :modifiedAt",
+      "set title = :title, #noteText = :text, modifiedAt = :modifiedAt",
+    ExpressionAttributeNames: {
+      "#noteText": "text",
+    },
     ExpressionAttributeValues: {
       ":title": title,
       ":text": text,
@@ -39,14 +42,18 @@ const updateNote = async (event) => {
       }),
     };
   } catch (error) {
+    console.error("Error updating note:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Could not update note" }),
+      body: JSON.stringify({
+        error: "Could not update note",
+        details: error.message,
+      }),
     };
   }
 };
 
-export const handler = middy(updateNote)
+module.exports.handler = middy(updateNote)
   .use(jsonBodyParser())
   .use(authMiddleware())
   .use(httpErrorHandler());
