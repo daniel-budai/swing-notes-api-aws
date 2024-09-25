@@ -6,7 +6,6 @@ const httpErrorHandler = require("@middy/http-error-handler");
 const authMiddleware = require("../../../middleware/authMiddleware");
 
 const addNote = async (event) => {
-  console.log("Received event:", JSON.stringify(event, null, 2));
   const { title, text } = event.body;
 
   if (!title || !text || title.length > 50 || text.length > 300) {
@@ -33,7 +32,6 @@ const addNote = async (event) => {
 
   try {
     await db.put(params);
-    console.log("Note saved successfully:", note);
     return {
       statusCode: 201,
       body: JSON.stringify({
